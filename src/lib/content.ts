@@ -47,7 +47,7 @@ export const books: Book[] = [
     author: "Andrew Hunt & David Thomas",
     edition: "20th Anniversary Edition",
     status: "read",
-    take: "Placeholder — your one-line take goes here.",
+    take: "A timeless guide to software craftsmanship that proves good design is always easier to change, and great code starts with taking ownership.",
   },
   {
     title: "Talking to Strangers",
