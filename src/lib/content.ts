@@ -193,5 +193,113 @@ export const navLinks = [
   { label: "Now", href: "#now" },
   { label: "Reading", href: "#reading" },
   { label: "Experiments", href: "#experiments" },
+  { label: "Agents", href: "#agents" },
   { label: "Elsewhere", href: "#elsewhere" },
 ] as const;
+
+/* ------------------------------------------------------------------ */
+/* Agent usage — exported from the opencode analytics dashboard.       */
+/* To update: re-export your dashboard, copy the headline numbers and  */
+/* the per-day sessions array, and swap them in here.                  */
+/* ------------------------------------------------------------------ */
+
+export type DailySession = { date: string; sessions: number };
+
+export type AgentUsage = {
+  tool: string;
+  rangeLabel: string;
+  firstDate: string;
+  lastDate: string;
+  updatedAt: string;
+  kpis: {
+    sessions: number;
+    messages: number;
+    tokens: number; // raw total
+    cost: number; // USD
+    cacheEfficiency: number; // percentage, e.g. 947
+  };
+  tokenBreakdown: {
+    input: number;
+    output: number;
+    reasoning: number;
+    cacheRead: number;
+  };
+  costProjection: { monthly: number; annual: number };
+  daily: DailySession[];
+  topModels: { name: string; sessions: number; tokens: number }[];
+  topProjects: { name: string; sessions: number; tokens: number }[];
+};
+
+export const agentUsage: AgentUsage = {
+  tool: "opencode",
+  rangeLabel: "Jul 8 – Jul 26, 2026",
+  firstDate: "Jul 08, 2026",
+  lastDate: "Jul 26, 2026",
+  updatedAt: "Jul 26, 2026",
+  kpis: {
+    sessions: 1045,
+    messages: 30201,
+    tokens: 2768972257,
+    cost: 0.08,
+    cacheEfficiency: 947,
+  },
+  tokenBreakdown: {
+    input: 262267923,
+    output: 16883988,
+    reasoning: 6287202,
+    cacheRead: 2483533144,
+  },
+  costProjection: { monthly: 0.08, annual: 0.97 },
+  daily: [
+    { date: "2026-07-08", sessions: 28 },
+    { date: "2026-07-09", sessions: 120 },
+    { date: "2026-07-10", sessions: 92 },
+    { date: "2026-07-11", sessions: 35 },
+    { date: "2026-07-12", sessions: 23 },
+    { date: "2026-07-13", sessions: 3 },
+    { date: "2026-07-14", sessions: 97 },
+    { date: "2026-07-15", sessions: 43 },
+    { date: "2026-07-16", sessions: 21 },
+    { date: "2026-07-17", sessions: 107 },
+    { date: "2026-07-18", sessions: 15 },
+    { date: "2026-07-19", sessions: 193 },
+    { date: "2026-07-20", sessions: 87 },
+    { date: "2026-07-21", sessions: 28 },
+    { date: "2026-07-22", sessions: 104 },
+    { date: "2026-07-23", sessions: 6 },
+    { date: "2026-07-24", sessions: 2 },
+    { date: "2026-07-25", sessions: 36 },
+    { date: "2026-07-26", sessions: 5 },
+  ],
+  topModels: [
+    { name: "deepseek-v4-flash-free", sessions: 854, tokens: 1950160194 },
+    { name: "mimo-v2.5-free", sessions: 74, tokens: 133645296 },
+    { name: "big-pickle", sessions: 70, tokens: 114882832 },
+    { name: "nemotron-3-ultra-free", sessions: 8, tokens: 418919817 },
+    { name: "z-ai/glm-5.2", sessions: 9, tokens: 30277657 },
+  ],
+  topProjects: [
+    { name: "argus", sessions: 480, tokens: 574051069 },
+    { name: "decrypter-claude", sessions: 327, tokens: 1807627527 },
+    { name: "vicinae", sessions: 36, tokens: 50187134 },
+    { name: "zenno", sessions: 21, tokens: 14890743 },
+    { name: "chrome-claude-export", sessions: 15, tokens: 16220180 },
+  ],
+};
+
+/* Helpers for formatting the big numbers in the UI. */
+export function formatTokens(n: number): string {
+  if (n >= 1e9) return `${(n / 1e9).toFixed(2)}B`;
+  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
+  if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
+  return `${n}`;
+}
+
+export function formatNumber(n: number): string {
+  return n.toLocaleString("en-US");
+}
+
+export function formatCost(n: number): string {
+  if (n < 0.01) return `$${n.toFixed(2)}`;
+  return `$${n.toFixed(2)}`;
+}

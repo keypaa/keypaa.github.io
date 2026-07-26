@@ -25,10 +25,10 @@ export function Header() {
           : "border-b border-transparent bg-transparent",
       )}
     >
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5 sm:px-8">
+      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-3 px-5 sm:px-8">
         <a
           href="#top"
-          className="group flex items-center gap-2 font-serif text-[17px] font-medium tracking-tight"
+          className="group flex shrink-0 items-center gap-2 font-serif text-[17px] font-medium tracking-tight"
         >
           <span className="text-foreground transition-colors group-hover:text-clay">
             {profile.name}
@@ -36,12 +36,15 @@ export function Header() {
           <span className="inline-block h-1.5 w-1.5 translate-y-px rounded-full bg-clay transition-transform duration-300 group-hover:scale-125" />
         </a>
 
-        <nav className="flex items-center gap-1">
+        <nav
+          className="flex min-w-0 items-center gap-0.5 overflow-x-auto sm:gap-1 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]"
+          aria-label="Section navigation"
+        >
           {navLinks.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="rounded-md px-2.5 py-1.5 font-mono text-[12px] text-muted-foreground transition-colors hover:text-foreground sm:px-3"
+              className="shrink-0 whitespace-nowrap rounded-md px-2 py-1.5 font-mono text-[12px] text-muted-foreground transition-colors hover:text-foreground sm:px-3"
             >
               {l.label}
             </a>
@@ -50,7 +53,7 @@ export function Header() {
             href={profile.githubUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-1 hidden rounded-md border border-border/70 px-3 py-1.5 font-mono text-[12px] text-muted-foreground transition-colors hover:border-clay/50 hover:text-clay sm:inline-block"
+            className="ml-1 hidden shrink-0 rounded-md border border-border/70 px-3 py-1.5 font-mono text-[12px] text-muted-foreground transition-colors hover:border-clay/50 hover:text-clay sm:inline-block"
           >
             github
           </a>

@@ -3,6 +3,7 @@ import { Hero } from "@/components/site/hero";
 import { NowSection } from "@/components/site/now-section";
 import { Reading } from "@/components/site/reading";
 import { Experiments } from "@/components/site/experiments";
+import { AgentUsageSection } from "@/components/site/agent-usage";
 import { Elsewhere } from "@/components/site/elsewhere";
 import { Footer } from "@/components/site/footer";
 
@@ -24,6 +25,10 @@ export default function Home() {
           <div className="hairline h-px w-full" aria-hidden />
         </div>
         <Experiments />
+        <div className="mx-auto max-w-5xl px-5 sm:px-8">
+          <div className="hairline h-px w-full" aria-hidden />
+        </div>
+        <AgentUsageSection />
         <div className="mx-auto max-w-5xl px-5 sm:px-8">
           <div className="hairline h-px w-full" aria-hidden />
         </div>
