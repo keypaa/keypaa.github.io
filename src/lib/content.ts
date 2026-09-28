@@ -79,6 +79,7 @@ export type Experiment = {
   tags: string[];
   status: "live" | "wip" | "planning";
   link?: { label: string; href: string };
+  services?: { group: string; items: string[] }[];
 };
 
 export const experiments: Experiment[] = [
@@ -151,20 +152,28 @@ export const experiments: Experiment[] = [
   {
     id: "homelab",
     name: "Homelab stack",
-    blurb: "A self-hosted stack I run and iterate on.",
+    blurb:
+      "13 compose projects on an OptiPlex-3070, all behind Traefik, plus a Hermes agent that does the daily driving.",
     detail:
-      "The substrate under most of my experiments: services, storage, and the little automations that make a Linux box feel like home.",
-    tags: ["infra", "self-hosted"],
+      "The substrate under most of my experiments: photos, media, bookmarks, DNS, and the dashboards that tell me the box is still alive. Intel UHD 630, no discrete GPU, everything on one 1TB drive and a 256GB NVMe. Watchtower keeps the images fresh, which is the least glamorous part of owning any of this.",
+    tags: ["infra", "self-hosted", "agents"],
     status: "live",
-  },
-  {
-    id: "hermes",
-    name: "Hermes agent, daily driver",
-    blurb: "Running a Hermes agent like everyone else, as my daily driver.",
-    detail:
-      "Not exotic, but it's the workhorse behind a lot of my day-to-day tinkering.",
-    tags: ["agents"],
-    status: "live",
+    services: [
+      { group: "AI", items: ["open-webui"] },
+      {
+        group: "Media",
+        items: ["immich", "jellyfin", "youtube-dl"],
+      },
+      { group: "Reading", items: ["karakeep"] },
+      {
+        group: "Network",
+        items: ["traefik", "adguard", "duckdns", "portainer"],
+      },
+      {
+        group: "Ops",
+        items: ["glance", "watchtower", "speedtest"],
+      },
+    ],
   },
 ];
 

@@ -43,6 +43,21 @@ function ExperimentCard({ exp }: { exp: Experiment }) {
           {exp.detail}
         </p>
 
+        {exp.services ? (
+          <dl className="relative mt-4 flex flex-col gap-1.5">
+            {exp.services.map((g) => (
+              <div key={g.group} className="flex gap-3">
+                <dt className="w-20 shrink-0 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground/70">
+                  {g.group}
+                </dt>
+                <dd className="font-mono text-[11.5px] leading-relaxed text-foreground/70">
+                  {g.items.join(" · ")}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
+
         <div className="relative mt-auto flex flex-wrap items-center gap-1.5 pt-5">
           {exp.tags.map((t) => (
             <span
