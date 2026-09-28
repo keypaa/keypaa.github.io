@@ -81,7 +81,7 @@ function DailyChart() {
           return (
             <motion.div
               key={d.date}
-              title={`${d.date} — ${d.sessions} sessions`}
+              title={`${d.date}: ${d.sessions} sessions`}
               className={cn(
                 "group relative flex-1 rounded-t-sm transition-colors",
                 isPeak
@@ -113,17 +113,18 @@ function DailyChart() {
 /* A labelled horizontal bar list — used for models and projects. */
 function BarList({
   items,
-  total,
-  formatValue,
+  metric,
 }: {
   items: { name: string; sessions: number; tokens: number }[];
-  total: number;
-  formatValue: (n: number) => string;
+  metric: "sessions" | "tokens";
 }) {
+  const max = Math.max(...items.map((it) => it[metric]));
   return (
     <div className="flex flex-col gap-3">
       {items.map((it, i) => {
-        const pct = (it.sessions / total) * 100;
+        // Sqrt keeps the leader at full width without flattening the tail to
+        // slivers, which is what a linear scale does when values span 1.9B to 55K.
+        const pct = (Math.sqrt(it[metric]) / Math.sqrt(max)) * 100;
         return (
           <Reveal key={it.name} delay={i * 0.05} y={10}>
             <div>
@@ -132,7 +133,9 @@ function BarList({
                   {it.name}
                 </span>
                 <span className="shrink-0 font-mono text-[11px] text-muted-foreground">
-                  {it.sessions} · {formatValue(it.tokens)} tok
+                  {metric === "sessions"
+                    ? `${it.sessions} sess · ${formatTokens(it.tokens)}`
+                    : `${formatTokens(it.tokens)} · ${it.sessions} sess`}
                 </span>
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/60">
@@ -153,13 +156,7 @@ function BarList({
 }
 
 export function AgentUsageSection() {
-  const { kpis, tokenBreakdown, topModels, topProjects, costProjection } =
-    agentUsage;
-  const totalModelSessions = topModels.reduce((s, m) => s + m.sessions, 0);
-  const totalProjectSessions = topProjects.reduce(
-    (s, p) => s + p.sessions,
-    0,
-  );
+  const { kpis, tokenBreakdown, topModels, topProjects, daily } = agentUsage;
   // Honest cache metric: of all tokens processed, the fraction served from cache.
   const cacheShare = Math.round(
     (tokenBreakdown.cacheRead / kpis.tokens) * 100,
@@ -176,11 +173,12 @@ export function AgentUsageSection() {
           I run a lot of agents. Here are the receipts.
         </h2>
         <p className="mt-3 max-w-2xl text-[14.5px] leading-relaxed text-muted-foreground">
-          {agentUsage.rangeLabel} on {agentUsage.tool} —{" "}
+          {agentUsage.rangeLabel} across {agentUsage.tool}, {" "}
           {formatNumber(kpis.sessions)} sessions,{" "}
           {formatTokens(kpis.tokens)} tokens processed,{" "}
           {formatCost(kpis.cost)} spent. Being a free-tier hacker has its
-          perks.
+          perks. Sessions count the ones I started myself, with subagent
+          fan-out left out.
         </p>
       </Reveal>
 
@@ -191,7 +189,7 @@ export function AgentUsageSection() {
             <Kpi
               label="sessions"
               value={formatNumber(kpis.sessions)}
-              sub="19 days"
+              sub={`${daily.length} active days`}
             />
           </StaggerItem>
           <StaggerItem>
@@ -212,7 +210,7 @@ export function AgentUsageSection() {
             <Kpi
               label="total cost"
               value={formatCost(kpis.cost)}
-              sub={`~${formatCost(costProjection.annual)}/yr projected`}
+              sub="free tier, preview, or via opencode"
               accent
             />
           </StaggerItem>
@@ -243,11 +241,7 @@ export function AgentUsageSection() {
                 by sessions
               </span>
             </div>
-            <BarList
-              items={topModels}
-              total={totalModelSessions}
-              formatValue={formatTokens}
-            />
+            <BarList items={topModels} metric="sessions" />
           </div>
         </Reveal>
 
@@ -258,14 +252,10 @@ export function AgentUsageSection() {
                 top projects
               </h3>
               <span className="font-mono text-[10px] text-muted-foreground/70">
-                by sessions
+                by tokens
               </span>
             </div>
-            <BarList
-              items={topProjects}
-              total={totalProjectSessions}
-              formatValue={formatTokens}
-            />
+            <BarList items={topProjects} metric="tokens" />
           </div>
         </Reveal>
       </div>
@@ -279,7 +269,9 @@ export function AgentUsageSection() {
           {Math.round(
             (tokenBreakdown.cacheRead / kpis.tokens) * 100,
           )}
-          % of all tokens — the prompt cache does the heavy lifting.
+          % of all tokens: the prompt cache does the heavy lifting.
+          analytics tools estimate $1,891 for the same usage, since they
+          price free models at list rate.
         </p>
       </Reveal>
     </section>

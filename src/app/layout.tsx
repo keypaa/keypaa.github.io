@@ -23,9 +23,9 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Keylhan Paumard--André — tinkering with AI from a Linux box in Paris",
+  title: "Keylhan Paumard--André, tinkering with AI from a Linux box in Paris",
   description:
-    "Keylhan (keypaa) — engineering student at EFREI Paris. Reverse-engineering AI tools, building local-first tinkering, reading widely. Notes, reading log, and experiments.",
+    "Keylhan (keypaa), engineering student at EFREI Paris. Reverse-engineering AI tools, building local-first tinkering, reading widely. Notes, reading log, and experiments.",
   keywords: [
     "Keylhan",
     "keypaa",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Keylhan Paumard--André" }],
   creator: "Keylhan Paumard--André",
   openGraph: {
-    title: "Keylhan — tinkering with AI from Paris",
+    title: "Keylhan, tinkering with AI from Paris",
     description:
       "Reading log, experiments, and notes from a Linux-box AI tinkerer at EFREI Paris.",
     siteName: "keypaa",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Keylhan — tinkering with AI from Paris",
+    title: "Keylhan, tinkering with AI from Paris",
     description:
       "Reading log, experiments, and notes from a Linux-box AI tinkerer at EFREI Paris.",
     creator: "@keylhan_p",

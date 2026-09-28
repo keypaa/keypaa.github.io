@@ -8,7 +8,7 @@ export function NowSection() {
   // Compute the school line on the client after mount to avoid SSR/client
   // timezone hydration mismatches.
   const [schoolValue, setSchoolValue] = React.useState<string>(
-    "EFREI Paris — year 1 / 5",
+    "EFREI Paris, year 1 / 5",
   );
 
   React.useEffect(() => {
