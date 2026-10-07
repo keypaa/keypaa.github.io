@@ -80,6 +80,14 @@ export type Experiment = {
   status: "live" | "wip" | "planning";
   link?: { label: string; href: string };
   services?: { group: string; items: string[] }[];
+  story?: StorySection[];
+  facts?: { label: string; value: string }[];
+};
+
+export type StorySection = {
+  heading: string;
+  body: string[];
+  quote?: string;
 };
 
 export const experiments: Experiment[] = [
@@ -91,6 +99,38 @@ export const experiments: Experiment[] = [
     detail:
       "Curiosity-driven teardown. Figured out the moving parts, then re-implemented them myself to actually understand the design.",
     tags: ["reverse-engineering", "from-scratch"],
+    facts: [
+      { label: "hypervisor", value: "Firecracker" },
+      { label: "boot", value: "custom kernel + initrd" },
+      { label: "docs", value: "4 guides" },
+    ],
+    story: [
+      {
+        heading: "Why rebuild it",
+        body: [
+          "Claude's web sandbox is one of those systems that looks simple until you open the hood. Rather than read about how it works, I took it apart and rebuilt the moving parts myself. The point was never to clone a product; it was to understand the design decisions by feeling them.",
+        ],
+      },
+      {
+        heading: "Architecture",
+        body: [
+          "At the core sits a Firecracker microVM: a minimal kernel and a custom initrd, launched through the Firecracker API socket. A TAP device gives the guest network egress, and a WebSocket control plane bridges the browser to the serial console. Every piece is a small shell script you can read in one sitting.",
+        ],
+      },
+      {
+        heading: "Pieces worth knowing",
+        body: [
+          "The kernel and VM config live in sandbox/kernel/microvm.config and sandbox/firecracker/vm-config.json. setup-tap.sh brings up the network, build-initrd.sh assembles the ramdisk, and launch.sh ties everything together. Serial output lands in /tmp/fusebox-serial.log, and the WebSocket protocol is documented in websocket.md.",
+        ],
+        quote: "The fastest way to understand a system is to build it again.",
+      },
+      {
+        heading: "What it taught me",
+        body: [
+          "Boot chains, network namespaces, and the Firecracker API stop being mysterious once you have launched your own microVM from scratch. The debugging notes in troubleshooting.md are the best proof: every odd behavior got a root cause written down next to it.",
+        ],
+      },
+    ],
     status: "live",
     link: {
       label: "github.com/keypaa/fusebox",
@@ -105,6 +145,38 @@ export const experiments: Experiment[] = [
     detail:
       "I burned a lot of Colab sessions recompiling llama.cpp every time: 4 cores, 20+ minutes each. So I scripted the painful part away. Now a fresh cloud instance is usable in minutes.",
     tags: ["tooling", "infra", "local-first"],
+    facts: [
+      { label: "binaries", value: "per SM version" },
+      { label: "install time", value: "seconds" },
+      { label: "stars", value: "7" },
+    ],
+    story: [
+      {
+        heading: "The problem",
+        body: [
+          "The official llama.cpp releases ship pre-built Windows CUDA binaries and nothing for Linux. Run llama.cpp across cloud instances and you recompile from source on every machine: 4 cores, 20+ minutes each, every single time. That is how I burned most of my early Colab sessions.",
+        ],
+      },
+      {
+        heading: "The fix",
+        body: [
+          "Build once per GPU SM version, store the binary on GitHub Releases, pull it anywhere in seconds. pull.sh detects the GPU, finds the matching binary, verifies its SHA256 checksum, and installs it to ~/.local/bin/llama. The archive bundles the CUDA runtime, so the target machine only needs a compatible driver.",
+        ],
+        quote: "Twenty minutes of compile time, every session, is a tax you only notice once you stop paying it.",
+      },
+      {
+        heading: "The tooling",
+        body: [
+          "Six scripts cover the whole lifecycle: detect.sh for diagnostics, build.sh for compiling and uploading, pull.sh for installing, list.sh for browsing the store, verify.sh for checksums, and cleanup.sh for removing old versions. configs/gpu_map.json maps GPU model names to SM versions, and CI auto-builds every SM version on each new llama.cpp release.",
+        ],
+      },
+      {
+        heading: "Where it runs",
+        body: [
+          "T4, A100, L40S, RTX 4090, H100: if it has an SM number, it has a binary. The repo has picked up a small following, and the pattern generalizes to any project that ships Windows-only binaries.",
+        ],
+      },
+    ],
     status: "live",
     link: {
       label: "github.com/keypaa/llamaup",
@@ -119,6 +191,38 @@ export const experiments: Experiment[] = [
     detail:
       "A bit borderline, legally, but a great exercise. Currently working on recovering meaningful function names from the minified output, so LLMs can actually navigate the codebase instead of drowning in garbage symbols.",
     tags: ["reverse-engineering", "tooling"],
+    facts: [
+      { label: "target", value: "claude.exe v2.1.205" },
+      { label: "bundle", value: "19 MB JS" },
+      { label: "patches", value: "9 shipped" },
+    ],
+    story: [
+      {
+        heading: "The target",
+        body: [
+          "The official Claude Code CLI is a single 100 MB Bun-compiled executable. Inside it sits a 19 MB JavaScript application bundled as a CommonJS IIFE that no one can edit. 0xClaude unpacks that bundle and gives it back to you as something patchable.",
+        ],
+      },
+      {
+        heading: "How it works",
+        body: [
+          "extract-bundle.py pulls the embedded JS and assets out of your own claude.exe. A small patch framework then layers changes on top: each patch is a CommonJS module that exports bundleTransform(source) => source and anchors itself to a unique string in the bundle. build.ps1 recompiles a fresh claude-fork.exe with the patched bundle, and an acceptance gate verifies --version output stays byte-identical.",
+        ],
+        quote: "The patches are small, self-contained, and toggle-able by renaming a file.",
+      },
+      {
+        heading: "The patch catalog",
+        body: [
+          "Nine patches ship today: model menus, providers, login, setmodel, auto-pairs, slash commands, classifier logging, hot-reload, and a hello-world demo. Enable the ones you want, disable the rest: alternate model providers like LiteLLM, NVIDIA NIM, or LM Studio appear in the native /model picker, get cached, hot-reload, and persist to ~/.claude/settings.json like built-in models.",
+        ],
+      },
+      {
+        heading: "Where it is heading",
+        body: [
+          "The next frontier is symbol recovery: pulling meaningful function names out of the minified output so an LLM can navigate the codebase instead of drowning in garbage identifiers. It is a bit borderline, legally, but it is a great exercise in how these tools are built.",
+        ],
+      },
+    ],
     status: "wip",
     link: {
       label: "github.com/keypaa/0xClaude",
@@ -133,6 +237,45 @@ export const experiments: Experiment[] = [
     detail:
       "Zenno watches what agents do and keeps them honest: four Shield guards block secret leaks, confidential-file reads, risky installs, and self-modification of Zenno itself; hard caps stop runaway subagent fan-out; a memory layer carries project knowledge across sessions; and a doctor, cost tracker, and trace exporter keep the whole thing observable. I run it on my own machine every day.",
     tags: ["plugin", "tooling", "agents"],
+    facts: [
+      { label: "guards", value: "4" },
+      { label: "tests", value: "432" },
+      { label: "hosts", value: "Claude Code + opencode" },
+    ],
+    story: [
+      {
+        heading: "The idea",
+        body: [
+          "Agents are only as trustworthy as the guardrails around them. Zenno is a plugin for Claude Code and opencode that watches what agents do and keeps them honest, without getting in the way of the work.",
+        ],
+      },
+      {
+        heading: "Four Shield guards",
+        body: [
+          "Secret Scanner blocks commits or pushes containing high-confidence secrets and high-entropy strings. Confidential File Guard blocks reads of sensitive files like .env and *.pem. Provenance Guard blocks global installs, typosquats, and very-recently-published packages. Haruspex Guard blocks any write to Zenno's own files. Guards fail safe: they deny on uncertainty, never auto-fix, and every override is a deliberate human action, never something negotiated mid-conversation.",
+        ],
+      },
+      {
+        heading: "Caps and teams",
+        body: [
+          "Hard caps stop runaway subagent fan-out: depth 3, 8 concurrent, 10 per task. Two fixed-size team templates, plan-stress-test and bounded-research, offer a disciplined alternative to open-ended fan-out.",
+        ],
+      },
+      {
+        heading: "Memory and observability",
+        body: [
+          "A memory layer carries project knowledge across sessions with git-versioned snapshots and rollback. A ctags-based repo graph indexes symbols and nudges when stale. OTLP-style telemetry, a cost tracker, a failure journal, and zenno doctor with 30+ health checks keep the whole thing observable.",
+          "The best guardrail is the one you never notice until you need it.",
+        ],
+        quote: "The best guardrail is the one you never notice until you need it.",
+      },
+      {
+        heading: "Why it matters",
+        body: [
+          "432 tests, all passing, on pure Node.js with zero dependencies. One core/ powers both hosts, so the same guards fire whether you are in Claude Code or opencode.",
+        ],
+      },
+    ],
     status: "live",
     link: {
       label: "github.com/keypaa/zenno",
@@ -147,6 +290,38 @@ export const experiments: Experiment[] = [
     detail:
       "The interesting part wasn't the app, it was the measurement. Zero-shot routing scored 91% in English but 62% in French, so I generated 2,500 labeled commands, fine-tuned Laya's multilingual checkpoint with RLCD on a Colab T4, and took French to 93%, then spent two more rounds chasing the confident mistakes that remained, and learned when to stop training and fix safety in plain code instead.",
     tags: ["voice", "on-device", "fine-tuning"],
+    facts: [
+      { label: "STT", value: "Voxtral" },
+      { label: "router", value: "Laya, fine-tuned" },
+      { label: "French routing", value: "62% → 93%" },
+    ],
+    story: [
+      {
+        heading: "The product",
+        body: [
+          "A voice-controlled clock that runs its command routing on-device: mic in, Voxtral STT, a locally fine-tuned Laya router, cloud LLM only as fallback. It speaks French and English, including mixed sentences.",
+        ],
+      },
+      {
+        heading: "The measurement",
+        body: [
+          "The interesting part was not the app, it was the numbers. Zero-shot routing scored 91% in English but 62% in French. That gap was the whole project: a bilingual device that quietly works better in one language is not bilingual.",
+        ],
+      },
+      {
+        heading: "The fix",
+        body: [
+          "I generated 2,500 labeled commands and fine-tuned Laya's multilingual checkpoint with RLCD on a Colab T4. French routing climbed to 93%, then two more rounds chased the confident mistakes that remained.",
+        ],
+        quote: "A model that answers confidently in the wrong language is worse than one that says nothing.",
+      },
+      {
+        heading: "The lesson",
+        body: [
+          "The last round taught me when to stop training and fix safety in plain code instead. Some failure modes are not data problems; they are design problems wearing a data costume.",
+        ],
+      },
+    ],
     status: "wip",
   },
   {

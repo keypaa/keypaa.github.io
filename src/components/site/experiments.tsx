@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import { experiments, type Experiment } from "@/lib/content";
 import {
   Eyebrow,
@@ -15,7 +16,7 @@ function ExperimentCard({ exp }: { exp: Experiment }) {
   const isPlanning = exp.status === "planning";
   return (
     <StaggerItem>
-      <article
+      <div
         className={cn(
           "group relative flex h-full flex-col overflow-hidden rounded-2xl border bg-card/30 p-6 transition-all duration-300 hover:-translate-y-1 hover:bg-card/55",
           isPlanning
@@ -31,7 +32,9 @@ function ExperimentCard({ exp }: { exp: Experiment }) {
 
         <div className="relative flex items-start justify-between gap-3">
           <h3 className="font-serif text-lg font-medium leading-snug tracking-tight text-foreground">
-            {exp.name}
+            <Link href={`/experiments/${exp.id}`} className="hover:text-clay transition-colors">
+              {exp.name}
+            </Link>
           </h3>
           <StatusBadge status={exp.status} className="shrink-0" />
         </div>
@@ -84,7 +87,7 @@ function ExperimentCard({ exp }: { exp: Experiment }) {
             more soon
           </div>
         )}
-      </article>
+      </div>
     </StaggerItem>
   );
 }

@@ -3,6 +3,7 @@
 import * as React from "react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { navLinks, profile } from "@/lib/content";
+import { ThemeToggle } from "@/components/site/theme-toggle";
 import { cn } from "@/lib/utils";
 
 export function Header() {
@@ -58,6 +59,8 @@ export function Header() {
             github
           </a>
         </nav>
+
+        <ThemeToggle />
       </div>
     </motion.header>
   );
